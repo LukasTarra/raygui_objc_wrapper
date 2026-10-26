@@ -51,6 +51,7 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` done
 - [x] Add `Makefile` (macOS: clang, Cocoa Foundation, `-framework Foundation -framework Cocoa -framework IOKit -framework CoreFoundation -framework OpenGL`)
 - [x] Add `GNUmakefile` (Linux/GNUstep: `gnustep-config --objc-flags/--base-libs`, X11/GL link line)
 - [x] Sandbox build proof: demo compiles + links under GNUstep clang 19 (headless — `IsWindowReady()` guard prevents segfault without DISPLAY)
+- [x] Fix macOS `make` failure: (a) `GNUmakefile` shadowed `Makefile` on macOS (GNU make prefers GNUmakefile) → both files now identical, each dispatches on `uname -s`; (b) `-x objective-c` on the old single compile+link command leaked onto `libraylib.a` (clang parsed the archive as source → `!<arch>`/UTF-8 errors) → compile (.m→.o via pattern rule) and link are now separate steps, link has no `-x`. Added `LDFLAGS ?=` for portability. Verified in sandbox: `make` (picks GNUmakefile) compiles all 6 .m files, links demo with `libraylib.a` as a library, binary runs (exits cleanly headless)
 - [ ] Verify demo behavior visually against raygui's own `controls_test_suite` — **needs a machine with a display (macOS or Linux+X11)**
 
 ## Phase 6 — Second platform (AGENTS.md §6.6)

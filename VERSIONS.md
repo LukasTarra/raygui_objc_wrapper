@@ -74,4 +74,13 @@ idempotent and verifies both pins before applying.
   - Demo linked into a working ELF; TU rule proven via `nm` (all 61 `Gui*`
     `T` symbols defined exactly once, only in `RayguiImplementation.o`).
   - Headless run: exits cleanly via `IsWindowReady()` guard (no X server in sandbox).
+- 2026-10-26, Linux x86_64 (Debian 13 sandbox, clang 19.1.7, GNUstep 1.31):
+  - **Makefile fix verified end-to-end**: `make` (GNU make picks `GNUmakefile`,
+    which is now identical to `Makefile` and dispatches on `uname -s`) compiles
+    all 6 `.m` files to `.o` via the pattern rule (`-x objective-c` applies
+    only to sources), then links with `$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -o $(OUT)`
+    — **no `-x` at link**, so `libraylib.a` is linked as a static library.
+    Demo binary produced and runs (exits cleanly headless). This fixes the
+    user-reported macOS failure: `gnustep-config: Command not found` (GNUmakefile
+    shadowing) + `libraylib.a` parsed as Obj-C source (`-x` leaking onto the archive).
 - macOS clang build: pending (Phase 6/7 — requires an Apple toolchain host; `Makefile` ready).

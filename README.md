@@ -30,8 +30,8 @@ src/RGGAdvanced.m            list view, color picker, message box, text input, t
 src/RGGState.m               styles, font, state, icons
 src/RayguiImplementation.m   the ONLY file defining RAYGUI_IMPLEMENTATION
 examples/demo/main.m         acceptance harness
-Makefile                     macOS build
-GNUmakefile                  Linux / GNUstep build
+Makefile                     cross-platform build (dispatches on `uname -s`)
+GNUmakefile                  identical to Makefile (GNU make prefers it; harmless)
 ```
 
 ## Usage contract
@@ -106,20 +106,19 @@ cmake --build build --config Release
 cd ../..
 ```
 
-macOS:
+Both platforms — same command:
 
 ```sh
-make            # see Makefile for the clang command
+make            # dispatches on `uname -s`: macOS → Cocoa, Linux → GNUstep
 ```
 
-Linux (GNUstep):
-
-```sh
-make -f GNUmakefile
-```
+`Makefile` and `GNUmakefile` are intentionally identical (GNU make prefers
+`GNUmakefile`, so it does not matter which one `make` reads). Each `.m` file is
+compiled to `.o` separately (`-x objective-c` applies only to sources), then
+linked — `libraylib.a` is never passed through the compiler as source.
 
 Full build commands, including framework/library flags, are in AGENTS.md §5 and
-in the two makefiles.
+in the makefile.
 
 ## Status
 

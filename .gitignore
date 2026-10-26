@@ -2,6 +2,7 @@
 build/
 vendor/raylib/build/
 *.o
+*.d
 *.a
 *.so
 *.dylib
