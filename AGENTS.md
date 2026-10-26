@@ -9,6 +9,10 @@ Build `RayguiObjC`, a thin Objective-C wrapper around the raygui 5.0 control API
 
 The wrapper must depend on Foundation only (NSString, NSObject). Do not use AppKit types (NSRect, NSColor, NSView), so the same source links under both Cocoa and GNUstep without conditional includes.
 
+### 0.1 Progress tracking (mandatory)
+
+`TODO.md` at the repo root is the persistent log of what needs to be done vs. what has already been done. Keep it current: check items off as they complete (do not delete them), add newly discovered work as pending, and never let it drift from reality. It is the first place to look when resuming work on this project.
+
 ## 1. Pinned versions (mandatory)
 
 Pin by exact git tag in `raysan5/raygui` and `raysan5/raylib`. Record the tag and the resolved commit SHA in `VERSIONS.md` at the repo root. Never build against `master` of either repo: raygui master tracks raylib master, and the pair moves continuously.
@@ -207,6 +211,7 @@ Provide both a plain `Makefile` and a GNUstep `GNUmakefile` that build the same 
 
 ## 6. Implementation order
 
+0. Maintain `TODO.md` continuously (see §0.1) — it mirrors this order plus the acceptance checklist in §7.
 1. Clone/pin submodules at the exact tags; write `VERSIONS.md` (tag, SHA, cherry-picked fix if any).
 2. Build raylib statically on the host platform; compile raygui's C example `controls_test_suite` to prove the pinned pair compiles together. If it fails against raylib 6.2, stay on 6.0.
 3. Add `RayguiImplementation.m`; compile the C example again through the ObjC build to prove the TU rule is respected.
