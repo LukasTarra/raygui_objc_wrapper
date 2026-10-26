@@ -6,9 +6,9 @@ vendor/raylib/build/
 *.so
 *.dylib
 
-# Demo binaries
-demo
-examples/demo/demo
+# Demo binaries (the built executable, not the sources)
+/examples/demo/demo
+/demo
 
 # OS/editor noise
 .DS_Store
