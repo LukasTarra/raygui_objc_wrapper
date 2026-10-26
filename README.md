@@ -46,10 +46,28 @@ GNUmakefile                  Linux / GNUstep build
 4. In/out scalars are passed by C pointer — no NSNumber round-trips in the
    per-frame path.
 5. Result semantics (raygui 5.0): every control returns an `int` result —
-   `1` = pressed, `2` = changed, `>2` = control-specific. The wrapper exposes
-   this as the `RGGResult` enum; convenience methods return `BOOL`
-   (YES = pressed/changed) and `...Raw` variants return the raw result. See
-   `src/RayguiObjC.h` for the exact convention.
+   `1` = pressed, `2` = changed, `>2` = control-specific (e.g. `4` =
+   tab-close request). The wrapper exposes this as the `RGGResult` enum.
+   **Uniform mechanism:** every control has a `BOOL` convenience method
+   (YES = the control reports an interaction) and a `...Raw` variant returning
+   the raw `RGGResult`. See `src/RayguiObjC.h` for the exact per-control
+   semantics.
+
+## Wrapped controls (raygui 5.0)
+
+All 35 raygui 5.0 control entry points are wrapped across four categories on
+the `RGGui` facade (90 class methods total):
+
+| Category | Controls |
+| -------- | -------- |
+| `RGGui (Controls)` | label, button, labelButton, toggle, toggleGroup, toggleSlider, checkBox, slider, sliderBar, progressBar, textBox, valueBox, valueBoxFloat, comboBox, dropdownBox, spinner, dummyRec, grid |
+| `RGGui (Containers)` | windowBox, groupBox, panel, line, scrollPanel, statusBar |
+| `RGGui (Advanced)` | listView, colorPicker, colorPanel, colorBarAlpha, colorBarHue, colorPickerHSV, colorPanelHSV, messageBox, textInputDialog, tabBar |
+| `RGGui (State)` | enable, disable, lock, unlock, isLocked, setAlpha, setState, state, setFont, font, setStyle, style, loadStyleAtPath, loadStyleDefault, enableTooltip, disableTooltip, setTooltip, iconText, setIconScale, textWidth |
+
+`GuiGetState`/`GuiGetStyle`/`GuiGetTextWidth` are exposed via the State
+category; `GuiListViewEx`/`GuiTabBarEx` are used internally by the
+`;"`-joined `NSArray` convenience wrappers.
 
 ## Example
 

@@ -62,4 +62,11 @@ cd vendor/raygui && git am ../../patches/raygui-5.0-gui-colorpicker-hue-bar-fix.
     `PLATFORM=PLATFORM_DESKTOP`, `GRAPHICS=GRAPHICS_API_OPENGL_33`, X11 + miniaudio.
   - raygui `examples/controls_test_suite` compiled and linked against the pinned
     pair with `-Wall`: **0 errors, 0 warnings** from the pinned sources.
-- macOS clang build: pending (Phase 6/7 — requires an Apple toolchain host).
+- 2026-10-26, Linux x86_64 (Debian 13 sandbox, clang 19.1.7, GNUstep 1.31):
+  - Full wrapper (`src/*.m`) + `examples/demo/main.m` compiled with `-Wall`:
+    **0 errors, 0 new warnings** (only upstream raygui `GuiFontIconBaking`
+    unused-function warning inside the implementation TU).
+  - Demo linked into a working ELF; TU rule proven via `nm` (all 61 `Gui*`
+    `T` symbols defined exactly once, only in `RayguiImplementation.o`).
+  - Headless run: exits cleanly via `IsWindowReady()` guard (no X server in sandbox).
+- macOS clang build: pending (Phase 6/7 — requires an Apple toolchain host; `Makefile` ready).
