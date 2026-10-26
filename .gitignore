@@ -1,0 +1,16 @@
+# Build output
+build/
+vendor/raylib/build/
+*.o
+*.a
+*.so
+*.dylib
+
+# Demo binaries
+demo
+examples/demo/demo
+
+# OS/editor noise
+.DS_Store
+*.swp
+*~

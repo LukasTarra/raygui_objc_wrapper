@@ -1,0 +1,25 @@
+From b7d0c0eb00882c51a95d3460b6f0dba1075027f0 Mon Sep 17 00:00:00 2001
+From: Ray <raysan5@gmail.com>
+Date: Tue, 21 Jul 2026 15:06:42 +0200
+Subject: [PATCH] Fix issue with  `GuiColorPicker()`
+
+---
+ src/raygui.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/raygui.h b/src/raygui.h
+index f7a1161..b25f704 100644
+--- a/src/raygui.h
++++ b/src/raygui.h
+@@ -4214,7 +4214,7 @@ int GuiColorPicker(Rectangle bounds, const char *text, Color *color)
+     // NOTE: this conversion can cause low hue-resolution, if the r, g and b value are very similar, which causes the hue bar to shift around when only the GuiColorPanel is used
+     Vector3 hsv = ConvertRGBtoHSV(RAYGUI_CLITERAL(Vector3){ (*color).r/255.0f, (*color).g/255.0f, (*color).b/255.0f });
+ 
+-    if (result != RESULT_CHANGED) result = GuiColorBarHue(boundsHue, NULL, &hsv.x);
++    result = GuiColorBarHue(boundsHue, NULL, &hsv.x);
+ 
+     //color.a = (unsigned char)(GuiColorBarAlpha(boundsAlpha, (float)color.a/255.0f)*255.0f);
+     Vector3 rgb = ConvertHSVtoRGB(hsv);
+-- 
+2.47.3
+
