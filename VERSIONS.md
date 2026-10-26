@@ -83,4 +83,8 @@ idempotent and verifies both pins before applying.
     Demo binary produced and runs (exits cleanly headless). This fixes the
     user-reported macOS failure: `gnustep-config: Command not found` (GNUmakefile
     shadowing) + `libraylib.a` parsed as Obj-C source (`-x` leaking onto the archive).
-- macOS clang build: pending (Phase 6/7 — requires an Apple toolchain host; `Makefile` ready).
+- 2026-10-26, macOS 27 (Apple M1 Pro, clang, Cocoa Foundation) — verified by user:
+  - `make` builds the wrapper + demo clean (Makefile/GNUmakefile dispatch on `uname -s`).
+  - `./examples/demo/demo` runs: raylib 6.0 initializes (Metal-backed OpenGL 4.1),
+    window opens at 800x450, clean shutdown on close.
+- macOS interactive control verification (button/checkbox/slider/textbox): pending user testing.

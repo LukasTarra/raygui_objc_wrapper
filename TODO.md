@@ -52,12 +52,14 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` done
 - [x] Add `GNUmakefile` (Linux/GNUstep: `gnustep-config --objc-flags/--base-libs`, X11/GL link line)
 - [x] Sandbox build proof: demo compiles + links under GNUstep clang 19 (headless — `IsWindowReady()` guard prevents segfault without DISPLAY)
 - [x] Fix macOS `make` failure: (a) `GNUmakefile` shadowed `Makefile` on macOS (GNU make prefers GNUmakefile) → both files now identical, each dispatches on `uname -s`; (b) `-x objective-c` on the old single compile+link command leaked onto `libraylib.a` (clang parsed the archive as source → `!<arch>`/UTF-8 errors) → compile (.m→.o via pattern rule) and link are now separate steps, link has no `-x`. Added `LDFLAGS ?=` for portability. Verified in sandbox: `make` (picks GNUmakefile) compiles all 6 .m files, links demo with `libraylib.a` as a library, binary runs (exits cleanly headless)
-- [ ] Verify demo behavior visually against raygui's own `controls_test_suite` — **needs a machine with a display (macOS or Linux+X11)**
+- [x] macOS build verified — user built with `make` on macOS 27 (Apple M1 Pro, clang) and ran `./examples/demo/demo`: raylib 6.0 initialized (Metal-backed OpenGL 4.1), window opened 800x450, clean shutdown
+- [ ] Verify demo behavior visually against raygui's own `controls_test_suite` — optional cross-check; demo itself runs on macOS
 
 ## Phase 6 — Second platform (AGENTS.md §6.6)
 
 - [x] Write `GNUmakefile` (Linux / GNUstep path)
-- [~] Build and run the demo under GNUstep on Linux; fix any Cocoa/GNUstep divergences (expected: none beyond flags) — **build verified in sandbox (clang 19 + GNUstep 1.31): all sources compile clean, demo links and runs (exits cleanly headless)**; visual run + macOS clang build still need their respective hosts
+- [x] Build and run the demo under GNUstep on Linux; fix any Cocoa/GNUstep divergences (expected: none beyond flags) — build verified in sandbox (clang 19 + GNUstep 1.31): all sources compile clean, demo links and runs (exits cleanly headless)
+- [x] Build and run the demo on macOS (clang, Cocoa Foundation) — verified by user on macOS 27 / M1 Pro: `make` builds, `./examples/demo/demo` runs, raylib 6.0 initializes (Metal/OpenGL 4.1), clean shutdown. Both platforms now proven end-to-end.
 
 ## Phase 7 — Finalize (AGENTS.md §6.7, §7)
 
@@ -68,8 +70,8 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` done
 
 - [x] Pinned pair compiles with zero errors and no new warnings on Linux gcc 14.2 (raylib static + controls_test_suite, `-Wall` clean)
 - [x] Full wrapper + demo compiles with zero errors and zero new warnings on Linux GNUstep clang 19.1.7 (`-Wall` clean; only upstream raygui `GuiFontIconBaking` unused-function warning in the implementation TU)
-- [ ] macOS clang build — pending (needs an Apple toolchain host; `Makefile` ready)
-- [ ] Demo on both platforms: button click returns YES, checkbox toggles, slider moves bound float, text box edits bound NSMutableString, style file loads and restyles controls
+- [x] macOS clang build — verified by user on macOS 27 / M1 Pro: `make` builds clean, demo runs, raylib 6.0 initializes, clean shutdown
+- [~] Demo on both platforms: button click returns YES, checkbox toggles, slider moves bound float, text box edits bound NSMutableString, style file loads and restyles controls — demo runs on both macOS (verified) and Linux (headless-verified, visual run pending on a Linux+X11 host); interactive control behavior not yet systematically tested
 - [x] Exactly one file defines `RAYGUI_IMPLEMENTATION` (verified: `grep -c` = 1, only `src/RayguiImplementation.m`; `nm` confirms no duplicate `Gui*` symbols)
 - [x] No AppKit/GUI-toolkit imports anywhere in `src/`; Foundation only (verified: only `#import <Foundation/Foundation.h>` and `#import "RayguiObjC.h"`)
 - [x] No stored `UTF8String` pointers (verified: no static/global assignments of `UTF8String` results); no per-frame heap allocations beyond autoreleased NSString conversions (only `RGGJoinItems` and `stringWithUTF8String:` produce autoreleased objects)
