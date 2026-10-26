@@ -17,7 +17,7 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` done
 
 - [x] Check github.com/raysan5/raygui/releases for a patched release (5.0.1+) containing the `GuiColorPicker` hue-bar fix; pin it if it exists — **no patched release exists (v5.0 still latest as of 2026-10-26), pinning 5.0 + cherry-pick**
 - [x] Add `vendor/raylib` submodule, pin tag `6.0` (fallback plan: try `6.2` only after 6.0 works) — pinned `dbc56a87da87d973a9c5baa4e7438a9d20121d28`
-- [x] Add `vendor/raygui` submodule, pin tag `5.0` (commit `020a61bebcbe288b4414de3416e219ef40af847a`) + cherry-pick ONLY the hue-bar fix commit from master — cherry-picked `3ea06d4c3d1fe32acdbcd364118d55c1f69c8ef1` ("Fix issue with `GuiColorPicker()`"), local SHA `b7d0c0eb00882c51a95d3460b6f0dba1075027f0`; patch also saved at `patches/raygui-5.0-gui-colorpicker-hue-bar-fix.patch` for reproducible clones
+- [x] Add `vendor/raygui` submodule, pin tag `5.0` (commit `020a61bebcbe288b4414de3416e219ef40af847a`) + apply ONLY the hue-bar fix from master — upstream `3ea06d4c3d1fe32acdbcd364118d55c1f69c8ef1` ("Fix issue with `GuiColorPicker()`"), applied as a **working-tree patch** (`patches/raygui-5.0-gui-colorpicker-hue-bar-fix.patch`) via `scripts/init-submodules.sh` so the gitlink stays at the upstream tag (a local cherry-pick commit would be unpushable and break fresh clones — found and fixed after user hit missing-CMakeLists error)
 - [x] Verify exact tag names (`5.0` vs `v5.0`, etc.) against upstream and lock resolved SHAs — tags are unversioned (`5.0`, `6.0`), SHAs locked in `VERSIONS.md`
 - [x] Record tags, SHAs, and any cherry-picked fix (with upstream link) in `VERSIONS.md`
 

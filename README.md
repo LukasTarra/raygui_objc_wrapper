@@ -88,13 +88,12 @@ loaded at startup).
 
 ## Building
 
-Pinned versions live in `VERSIONS.md`. Submodules must be initialized at the
-pinned tags (plus the cherry-picked fix — see VERSIONS.md):
+Pinned versions live in `VERSIONS.md`. Initialize the pinned submodules with
+the provided script (it also applies the hue-bar fix to `vendor/raygui` as a
+working-tree patch — see VERSIONS.md):
 
 ```sh
-git submodule update --init
-# if the raygui submodule was reset to the bare tag, re-apply the fix:
-(cd vendor/raygui && git am ../../patches/raygui-5.0-gui-colorpicker-hue-bar-fix.patch)
+sh scripts/init-submodules.sh
 ```
 
 Build raylib statically, then the demo:

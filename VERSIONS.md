@@ -31,29 +31,34 @@ against it. Any mismatch fails at compile time, not silently. Not adopted.
 | Link   | https://github.com/raysan5/raygui/commit/020a61bebcbe288b4414de3416e219ef40af847a                 |
 | Submodule path | `vendor/raygui`                                                                      |
 
-### Cherry-picked fix (hue bar in `GuiColorPicker`)
+### Hue-bar fix in `GuiColorPicker` (applied as a working-tree patch)
 
 raygui 5.0 ships a known defect: the hue bar in `GuiColorPicker()` disappears
 because the hue-bar update is skipped when the result is already
 `RESULT_CHANGED`. As of 2026-10-26 no patched release (5.0.1+) exists —
 `v5.0` is still the latest release at https://github.com/raysan5/raygui/releases —
-so per AGENTS.md §1 we pin tag `5.0` and cherry-pick ONLY the upstream fix:
+so per AGENTS.md §1 we pin tag `5.0` and apply ONLY the upstream fix:
 
 | Field  | Value                                                                                          |
 | ------ | ---------------------------------------------------------------------------------------------- |
 | Upstream commit | `3ea06d4c3d1fe32acdbcd364118d55c1f69c8ef1` "Fix issue with `GuiColorPicker()`" (2026-07-21)   |
 | Link   | https://github.com/raysan5/raygui/commit/3ea06d4c3d1fe32acdbcd364118d55c1f69c8ef1                 |
-| Local cherry-pick SHA (in `vendor/raygui`) | `b7d0c0eb00882c51a95d3460b6f0dba1075027f0`                          |
+| Submodule gitlink | `020a61bebcbe288b4414de3416e219ef40af847a` (the bare upstream tag `5.0` — fetchable by anyone) |
 | Diff   | 1 line in `src/raygui.h`: `if (result != RESULT_CHANGED) result = GuiColorBarHue(...)` → `result = GuiColorBarHue(...)` |
 
-The cherry-pick lives only in our submodule checkout (we cannot push to
-raysan5/raygui). For reproducible fresh clones, the patch is also committed at
-`patches/raygui-5.0-gui-colorpicker-hue-bar-fix.patch`; apply it after
-`git submodule update --init` if the submodule ever resets to the bare tag:
+**How it is applied:** the submodule gitlink points at the upstream tag (NOT a
+local cherry-pick — a local commit would be unpushable and would break fresh
+clones). The fix is applied as a **working-tree patch** by
+`scripts/init-submodules.sh`:
 
 ```sh
-cd vendor/raygui && git am ../../patches/raygui-5.0-gui-colorpicker-hue-bar-fix.patch
+sh scripts/init-submodules.sh
 ```
+
+The patch file is committed at `patches/raygui-5.0-gui-colorpicker-hue-bar-fix.patch`.
+After init, `vendor/raygui` has a dirty working tree (`M src/raygui.h`) — that
+is intentional and expected; do not commit or reset it. The script is
+idempotent and verifies both pins before applying.
 
 ## Verification record
 

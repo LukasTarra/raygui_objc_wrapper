@@ -14,3 +14,7 @@ examples/demo/demo
 .DS_Store
 *.swp
 *~
+
+# Submodule working-tree patches (applied by scripts/init-submodules.sh)
+# The raygui submodule intentionally has a dirty working tree after init;
+# `git status` noise is expected and harmless.

@@ -1,9 +1,9 @@
 # Makefile — macOS build (clang, Cocoa Foundation, no ARC).
 #
 # Prerequisites:
-#   1. git submodule update --init
-#      (if the raygui submodule reset to the bare tag, re-apply the fix:
-#       cd vendor/raygui && git am ../../patches/raygui-5.0-gui-colorpicker-hue-bar-fix.patch)
+#   1. sh scripts/init-submodules.sh
+#      (initializes vendor/raylib @ 6.0 and vendor/raygui @ 5.0, and applies
+#       the hue-bar fix patch to the raygui working tree)
 #   2. Build raylib statically:
 #      cd vendor/raylib && cmake -B build -DCMAKE_BUILD_TYPE=Release \
 #        -DBUILD_SHARED_LIBS=OFF -DBUILD_EXAMPLES=OFF && cmake --build build
