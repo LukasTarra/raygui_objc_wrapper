@@ -1,0 +1,30 @@
+# .ccls — ccls language-server configuration for RayguiObjC.
+#
+# Mirrors the macOS compile flags in Makefile: clang, Cocoa
+# Foundation, no ARC, C11 for the wrapper sources.
+#
+# `-x objective-c` is global on purpose: without it clang parses this
+# project's headers (RayguiObjC.h) as plain C and fails on `@interface`.
+# Objective-C is a strict superset of C, so the vendored raylib .c files
+# still index correctly under it.
+#
+# On Linux/GNUstep, Foundation flags from `gnustep-config --objc-flags`
+# would need to be added here instead of relying on the system SDK.
+
+clang
+-x
+objective-c
+-Wall
+-DPLATFORM_DESKTOP
+-DGRAPHICS_API_OPENGL_33
+-DGL_SILENCE_DEPRECATION
+-Isrc
+-Ivendor/raygui/src
+-Ivendor/raylib/src
+-Ivendor/raylib/src/external
+-Ivendor/raylib/src/external/glfw/include
+
+# Wrapper sources: manual retain/release, C11 — exactly what Makefile passes.
+%objective-c%
+-fno-objc-arc
+-std=c11
