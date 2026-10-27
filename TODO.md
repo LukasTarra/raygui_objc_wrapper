@@ -66,6 +66,10 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` done
 - [ ] Finalize `VERSIONS.md` (both repos, tags, SHAs, cherry-pick link)
 - [ ] Write `README.md`
 
+## Editor tooling
+
+- [x] Add `.ccls` for ccls (macOS clang flags from Makefile; global `-x objective-c` so `RayguiObjC.h` parses as ObjC; `%objective-c%` section adds `-fno-objc-arc -std=c11`) — verified with `ccls --index`: all 7 project files + `raygui.h`/`raylib.h` index with zero errors; `.ccls-cache/` gitignored
+
 ## Acceptance criteria checklist (AGENTS.md §7)
 
 - [x] Pinned pair compiles with zero errors and no new warnings on Linux gcc 14.2 (raylib static + controls_test_suite, `-Wall` clean)

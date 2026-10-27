@@ -117,10 +117,8 @@ make            # dispatches on `uname -s`: macOS → Cocoa, Linux → GNUstep
 compiled to `.o` separately (`-x objective-c` applies only to sources), then
 linked — `libraylib.a` is never passed through the compiler as source.
 
-Full build commands, including framework/library flags, are in AGENTS.md §5 and
-in the makefile.
+Full build commands, including framework/library flags, are in the makefile.
 
 ## Status
 
-See `TODO.md` for the current progress log and `AGENTS.md` for the full
-project brief (design, mapping table, acceptance criteria).
+See `TODO.md` for the current progress log. The project is finished, pending complete verification by the user.

@@ -15,6 +15,11 @@ vendor/raylib/build/
 .DS_Store
 *.swp
 *~
+#*#  # Emacs autosave
+.#*  # Emacs symlink lock files
+
+# ccls language-server index cache (created at project root on first run)
+.ccls-cache/
 
 # Submodule working-tree patches (applied by scripts/init-submodules.sh)
 # The raygui submodule intentionally has a dirty working tree after init;
