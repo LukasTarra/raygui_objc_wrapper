@@ -66,8 +66,9 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` done
 - [x] Write `MANUAL.md` — detailed user manual (usage from scratch, no raylib/raygui prior knowledge assumed); both complete code examples verified by compiling+linking through the Makefile on macOS (`make DEMO=… OUT=…`, `-Wall` clean)
 - [x] Adopt `MANUAL_REVIEW.md` feedback into MANUAL.md/README.md: fixed §3.5 build commands (`-x none` before `libraylib.a`), `setStyle:` color examples (packed `0xRRGGBBAA` int, not `GetColor()`), per-frame `@autoreleasepool` (§2/§4/§8/§14 + README bullet), tooltip set-before/clear-after pattern with pointer-lifetime note, dialog samples use `...Raw` variants (X button works) + lock/unlock modality, factual fixes (windowBox not draggable, slider label left-of-bar + no value text, tabBar clamp + close semantics, toggleSlider wording, Raw-variant exceptions), gaps filled (maxLength is UTF-8 bytes + truncation edge, `;` in items warning, display-only short overloads, dropped NULL label params, unwrapped raygui API §9.5, property/control table, RGGState doc, RGGJoinItems, resizing/Retina/two-textbox notes); fixed broken `.gitignore` Emacs patterns; every manual snippet re-verified by compiling
 - [ ] Wrapper hardening (from MANUAL_REVIEW.md gap 1): text writeback can crash if the C buffer holds invalid UTF-8 (`stringWithUTF8String:` → nil → `setString:nil` throws) — e.g. a bound string longer than 1023 bytes truncated mid-character by the stack-buffer copy. Suggested fix: nil-guard the writeback in `RGGControls.m`/`RGGAdvanced.m`. Not done — MANUAL.md §8 documents the limitation instead
-- [ ] Finalize `VERSIONS.md` (both repos, tags, SHAs, cherry-pick link)
-- [ ] Write `README.md`
+- [x] Render `MANUAL.md` to GravNav-branded `MANUAL.docx` in the repo root (gravnav-document-authoring skill, `--format docx`): brand styles/banner/tables/TOC verified by the render script; all 52 code blocks syntax-highlighted with an embedded uniform palette (831 colored runs, text verified identical, colors confirmed rendering via a scratch LibreOffice PDF + PyMuPDF span extraction)
+- [x] Finalize `VERSIONS.md` (both repos, tags, SHAs, cherry-pick link)
+- [x] Write `README.md`
 
 ## Phase 8 — WRAPPER_REVIEW.md adoption (2026-10-27)
 
