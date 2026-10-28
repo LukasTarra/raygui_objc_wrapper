@@ -79,7 +79,17 @@
 }
 
 + (void)setTooltip:(NSString *)tooltip {
-    GuiSetTooltip([tooltip UTF8String]);
+    // GuiSetTooltip() stores the pointer in a global, so the string must
+    // outlive the call — an autoreleased NSString's UTF8String does not.
+    // Copy into a wrapper-owned static buffer (AGENTS.md §7: no stored
+    // UTF8String pointers). Not thread-safe; like all of raygui, main thread only.
+    static char tooltipBuffer[1024];
+    if (tooltip == nil) {
+        GuiSetTooltip(NULL);
+        return;
+    }
+    snprintf(tooltipBuffer, sizeof(tooltipBuffer), "%s", [tooltip UTF8String]);
+    GuiSetTooltip(tooltipBuffer);
 }
 
 + (NSString *)iconText:(int)iconId text:(NSString *)text {

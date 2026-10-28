@@ -87,4 +87,14 @@ idempotent and verifies both pins before applying.
   - `make` builds the wrapper + demo clean (Makefile/GNUmakefile dispatch on `uname -s`).
   - `./examples/demo/demo` runs: raylib 6.0 initializes (Metal-backed OpenGL 4.1),
     window opens at 800x450, clean shutdown on close.
+- 2026-10-27, macOS 27 (Apple M1 Pro, clang, Cocoa Foundation) — WRAPPER_REVIEW.md adoption:
+  - Full rebuild clean with `-Wall` (only the known upstream `GuiFontIconBaking`
+    unused-function warning inside the implementation TU).
+  - `make test` green: 22/22 window-free unit tests (`RGGJoinItems`,
+    `RGGCopyToBuffer` UTF-8 clamping, `RGGSetStringFromBuffer` nil-guard,
+    constants) plus the hidden-window smoke test (3 frames calling every
+    wrapped control, both `textInputDialogRaw:` `secretView` paths, a 130-item
+    list exercising the truncation warning) — exits 0, "SMOKE OK".
+  - Header dependency tracking verified: touching `RayguiObjC.h` rebuilds all
+    6 objects; a no-change `make` reports "Nothing to be done".
 - macOS interactive control verification (button/checkbox/slider/textbox): pending user testing.

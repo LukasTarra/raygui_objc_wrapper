@@ -63,8 +63,29 @@ Legend: `[ ]` pending · `[~]` in progress · `[x]` done
 
 ## Phase 7 — Finalize (AGENTS.md §6.7, §7)
 
+- [x] Write `MANUAL.md` — detailed user manual (usage from scratch, no raylib/raygui prior knowledge assumed); both complete code examples verified by compiling+linking through the Makefile on macOS (`make DEMO=… OUT=…`, `-Wall` clean)
+- [x] Adopt `MANUAL_REVIEW.md` feedback into MANUAL.md/README.md: fixed §3.5 build commands (`-x none` before `libraylib.a`), `setStyle:` color examples (packed `0xRRGGBBAA` int, not `GetColor()`), per-frame `@autoreleasepool` (§2/§4/§8/§14 + README bullet), tooltip set-before/clear-after pattern with pointer-lifetime note, dialog samples use `...Raw` variants (X button works) + lock/unlock modality, factual fixes (windowBox not draggable, slider label left-of-bar + no value text, tabBar clamp + close semantics, toggleSlider wording, Raw-variant exceptions), gaps filled (maxLength is UTF-8 bytes + truncation edge, `;` in items warning, display-only short overloads, dropped NULL label params, unwrapped raygui API §9.5, property/control table, RGGState doc, RGGJoinItems, resizing/Retina/two-textbox notes); fixed broken `.gitignore` Emacs patterns; every manual snippet re-verified by compiling
+- [ ] Wrapper hardening (from MANUAL_REVIEW.md gap 1): text writeback can crash if the C buffer holds invalid UTF-8 (`stringWithUTF8String:` → nil → `setString:nil` throws) — e.g. a bound string longer than 1023 bytes truncated mid-character by the stack-buffer copy. Suggested fix: nil-guard the writeback in `RGGControls.m`/`RGGAdvanced.m`. Not done — MANUAL.md §8 documents the limitation instead
 - [ ] Finalize `VERSIONS.md` (both repos, tags, SHAs, cherry-pick link)
 - [ ] Write `README.md`
+
+## Phase 8 — WRAPPER_REVIEW.md adoption (2026-10-27)
+
+- [x] Fix three wrong style-property constants: `RGGScrollBarWidth` 16→18 (`SCROLLBAR_WIDTH`), `RGGScrollBarSide` 17→19 (`SCROLLBAR_SIDE`), `RGGScrollSpeed` 18→21 (`SCROLL_SPEED`) — the old values actually set `LIST_ITEMS_HEIGHT`/`LIST_ITEMS_SPACING`/`SCROLL_SLIDER_PADDING`
+- [x] Complete the `RGGProperty` enum (combo/dropdown/`RGGTextReadonly`/spinner/tab/listview/colorpicker properties; `TAB_CLOSE_BUTTON` now named `RGGTabCloseButton`)
+- [x] `_Static_assert` table in `RayguiImplementation.m` pinning all 77 `RGG*` constants to the pinned raygui 5.0 (catches upstream renumbering at compile time)
+- [x] `textInputDialogRaw:` passes `NULL` through for `secretView` when the caller's is `NULL` (the eye-toggle is no longer drawn for the short variant, where its state was lost every frame)
+- [x] UTF-8 safety: `RGGCopyToBuffer` clamps at a UTF-8 boundary (never splits a multibyte character); new `RGGSetStringFromBuffer` nil-guards the writeback (no more `setString:nil` throw on invalid UTF-8)
+- [x] `setTooltip:` copies into a wrapper-owned static buffer — no stored `UTF8String` pointer (AGENTS.md §7)
+- [x] VLA fix: `RGGTextBufferSize` enum constant for the 1024-byte stack buffers
+- [x] `NSParameterAssert` on all in/out pointers; nullability annotations (`RGG_NULLABLE` + assume-nonnull regions, gcc-safe); `+new`/`-init` `NS_UNAVAILABLE`; main-thread-only documented in the header
+- [x] `progressBar:` aligned with AGENTS.md §3.1 — by-value `float`, returns `void` (was `BOOL`/`Raw` with `float *`)
+- [x] `RGGJoinItems` logs a `WARNING` past raygui's `GuiTextSplit` limits (128 items / 1023 bytes)
+- [x] Demo: editable textBox + spinner (`editMode` flags), per-frame `@autoreleasepool`, wider coverage (progressBar, toggleGroup, listView, modal messageBox), `<stdio.h>`, NSLog feedback, updated header comment
+- [x] Makefile: `-MMD -MP` header dependency tracking; `GNUmakefile` is now a one-line `include Makefile`; `make deps` and `make test` targets
+- [x] `tests/`: `test_wrapper.m` (22 window-free unit tests) + `smoke_test.m` (hidden-window, 3 frames of every control); `make test` green on macOS 27 / M1 Pro
+- [x] MANUAL.md / README.md updated for all of the above
+- [ ] Not adopted (design decisions, documented in MANUAL.md): keeping the display-only short overloads (AGENTS.md §3.1 lists them as the primary signatures), `messageBox:` returning 0 for none-and-X (the `Raw` variant disambiguates), per-call autoreleased allocations (per-frame pool covers them), out-of-tree `build/` directory
 
 ## Editor tooling
 

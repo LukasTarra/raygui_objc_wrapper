@@ -7,6 +7,8 @@
 @implementation RGGui (Advanced)
 
 + (RGGResult)listViewRaw:(Rectangle)bounds items:(NSArray<NSString *> *)items selected:(int *)selected scrollIndex:(int *)scroll {
+    NSParameterAssert(selected != NULL);
+    NSParameterAssert(scroll != NULL);
     return (RGGResult)GuiListView(bounds, [RGGJoinItems(items) UTF8String], scroll, selected);
 }
 
@@ -15,6 +17,7 @@
 }
 
 + (RGGResult)colorPickerRaw:(Rectangle)bounds color:(Color *)color {
+    NSParameterAssert(color != NULL);
     return (RGGResult)GuiColorPicker(bounds, NULL, color);
 }
 
@@ -31,6 +34,7 @@
 }
 
 + (RGGResult)colorBarAlphaRaw:(Rectangle)bounds alpha:(float *)alpha {
+    NSParameterAssert(alpha != NULL);
     return (RGGResult)GuiColorBarAlpha(bounds, NULL, alpha);
 }
 
@@ -39,6 +43,7 @@
 }
 
 + (RGGResult)colorBarHueRaw:(Rectangle)bounds hue:(float *)hue {
+    NSParameterAssert(hue != NULL);
     return (RGGResult)GuiColorBarHue(bounds, NULL, hue);
 }
 
@@ -47,6 +52,7 @@
 }
 
 + (RGGResult)colorPickerHSVRaw:(Rectangle)bounds colorHsv:(Vector3 *)colorHsv {
+    NSParameterAssert(colorHsv != NULL);
     return (RGGResult)GuiColorPickerHSV(bounds, NULL, colorHsv);
 }
 
@@ -82,16 +88,21 @@
 + (RGGResult)textInputDialogRaw:(Rectangle)bounds title:(NSString *)title message:(NSString *)message
                         buttons:(NSArray<NSString *> *)buttons text:(NSMutableString *)text
                       secretView:(BOOL *)secretView pressedButton:(int *)pressedButton {
-    char buffer[RGGTextMaxLength + 1];
-    snprintf(buffer, sizeof(buffer), "%s", [[text description] UTF8String]);
+    NSParameterAssert(text != NULL);
+    char buffer[RGGTextBufferSize];
+    RGGCopyToBuffer(text, buffer, (int)sizeof(buffer));
     bool secret = (secretView != NULL && *secretView != NO);
     int btnActive = 0;
+    // Pass NULL through when the caller has no secretView: raygui draws the
+    // password eye-toggle only when secretViewActive is non-NULL, so passing a
+    // local would show a toggle whose state is lost every frame.
     RGGResult result = (RGGResult)GuiTextInputBox(bounds, [title UTF8String],
                                                    [message UTF8String], buffer,
-                                                   RGGTextMaxLength + 1,
+                                                   (int)sizeof(buffer),
                                                    [RGGJoinItems(buttons) UTF8String],
-                                                   &btnActive, &secret);
-    [text setString:[NSString stringWithUTF8String:buffer]];
+                                                   &btnActive,
+                                                   (secretView != NULL) ? &secret : NULL);
+    RGGSetStringFromBuffer(text, buffer);
     if (secretView != NULL) *secretView = (secret ? YES : NO);
     if (pressedButton != NULL) *pressedButton = btnActive;
     return result;
@@ -112,6 +123,7 @@
 }
 
 + (RGGResult)tabBarRaw:(Rectangle)bounds items:(NSArray<NSString *> *)items active:(int *)active {
+    NSParameterAssert(active != NULL);
     return (RGGResult)GuiTabBar(bounds, [RGGJoinItems(items) UTF8String], NULL, active);
 }
 

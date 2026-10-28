@@ -7,16 +7,19 @@ vendor/raylib/build/
 *.so
 *.dylib
 
-# Demo binaries (the built executable, not the sources)
+# Demo and test binaries (the built executables, not the sources)
 /examples/demo/demo
 /demo
+/tests/test_wrapper
+/tests/smoke_test
 
 # OS/editor noise
 .DS_Store
 *.swp
 *~
-#*#  # Emacs autosave
-.#*  # Emacs symlink lock files
+# Emacs autosave and symlink lock files (a leading # in a pattern must be escaped)
+\#*#
+.#*
 
 # ccls language-server index cache (created at project root on first run)
 .ccls-cache/
