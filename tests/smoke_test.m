@@ -4,7 +4,6 @@
 // Built and run by `make test`.
 
 #import <Foundation/Foundation.h>
-#include <stdio.h>
 #include "raylib.h"
 #import "RayguiObjC.h"
 

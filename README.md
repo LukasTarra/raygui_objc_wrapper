@@ -9,6 +9,9 @@ The wrapper compiles and runs identically on:
 
 - **macOS** — Cocoa Foundation, clang
 - **Linux** — GNUstep Foundation, clang/gcc
+- **Web (WebAssembly)** — emscripten + libobjc2 (GNUstep ObjC runtime) + a
+  minimal Foundation shim; runs in any modern browser (see "Building for the
+  web" below and MANUAL.md §3.6)
 
 It depends on Foundation only (`NSString`, `NSObject`). No AppKit types
 (`NSRect`, `NSColor`, `NSView`) are used, so the same source links under both
@@ -38,6 +41,11 @@ examples/demo/main.m         acceptance harness
 tests/                       unit tests + hidden-window smoke test (`make test`)
 Makefile                     cross-platform build (dispatches on `uname -s`)
 GNUmakefile                  one-line `include Makefile` (GNU make prefers it)
+Makefile.wasm                WebAssembly build — fully separate from `make` (see "Building for the web")
+wasm/                        wasm support: MiniFoundation shim, shell.html, deps script, libobjc2 patches, tests
+.wasm-deps/                  gitignored: libobjc2 cross-built for wasm32 (isolated prefix — nothing system-wide)
+wasm/build/                  gitignored: demo.html/.js/.wasm/.data + objects
+custom-styles/gravnav.rgs    GravNav-branded raygui theme (argv[1] natively; embedded in the wasm build)
 ```
 
 ## Usage contract
@@ -135,6 +143,35 @@ tracks header dependencies, so editing `RayguiObjC.h`/`raygui.h`/`raylib.h`
 rebuilds what depends on it.
 
 Full build commands, including framework/library flags, are in the makefile.
+
+### Building for the web (WebAssembly)
+
+The same sources also compile to a browser webapp. The wasm build is fully
+separate from the native one — different makefile, objects, and dependencies
+(`.wasm-deps/`, `wasm/build/`, `vendor/raylib/build-web/` are gitignored):
+
+```sh
+brew install emscripten            # once per machine
+make -f Makefile.wasm deps         # cross-build libobjc2 + raylib-web (one-time, slow)
+make -f Makefile.wasm test         # MiniFoundation unit tests, run under node
+make -f Makefile.wasm demo         # -> wasm/build/demo.html
+make -f Makefile.wasm run          # build + serve http://localhost:8000/demo.html
+```
+
+Then open **http://localhost:8000/demo.html** in a browser. Browsers refuse to
+fetch `.wasm` from `file://`, so always serve over HTTP — never open the HTML
+file directly. The GravNav style (`custom-styles/gravnav.rgs`) is embedded
+automatically (`--preload-file`) and passed as `argv[1]` via
+`Module.arguments` in `wasm/shell.html` — the same code path as `make run`.
+
+How it works: emscripten compiles the ObjC but ships **no ObjC runtime and no
+Foundation**, so `wasm/scripts/build-deps.sh` cross-builds **libobjc2** for
+wasm32 (with `-fobjc-runtime=gnustep-2.0`; three small upstream patches in
+`wasm/patches/`) and the wrapper links against a minimal Foundation shim
+(`wasm/MiniFoundation/`). raylib is built for `PLATFORM=Web` and linked with
+`-sUSE_GLFW=3 -sASYNCIFY`; the final link uses `em++` because `libobjc.a`
+contains C++ objects. The native `make` build is unaffected. See MANUAL.md §3.6
+for the full walkthrough.
 
 ## Status
 

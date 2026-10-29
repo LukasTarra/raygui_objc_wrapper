@@ -1,0 +1,57 @@
+diff --git a/associate.mm b/associate.mm
+index 7c1a394..3df83aa 100644
+--- a/associate.mm
++++ b/associate.mm
+@@ -165,18 +165,15 @@ static void setReference(struct reference_list *list,
+ 		lock = lock_for_pointer(r);
+ 		lock->lock();
+ 	}
+-	@try
++	// WASM patch: clang does not implement @finally for WebAssembly, and
++	// objc_release() does not throw, so the @try/@finally pair is equivalent
++	// to straight-line code here.
++	if (OBJC_ASSOCIATION_ASSIGN != r->policy)
+ 	{
+-		if (OBJC_ASSOCIATION_ASSIGN != r->policy)
+-		{
+-			objc_release((id)r->object);
+-		}
+-	}
+-	@finally
+-	{
+-		r->policy = policy;
+-		r->object = obj;
++		objc_release((id)r->object);
+ 	}
++	r->policy = policy;
++	r->object = obj;
+ 	if (needLock)
+ 	{
+ 		lock->unlock();
+diff --git a/loader.c b/loader.c
+index efec18c..081f198 100644
+--- a/loader.c
++++ b/loader.c
+@@ -55,7 +55,9 @@ static void init_runtime(void)
+ 		init_alias_table();
+ 		init_early_blocks();
+ 		init_arc();
+-#if defined(EMBEDDED_BLOCKS_RUNTIME)
++// WASM patch: block_to_imp.c (which defines init_trampolines) is not built
++// for WebAssembly — there are no assembly trampolines to initialise there.
++#if defined(EMBEDDED_BLOCKS_RUNTIME) && !defined(__EMSCRIPTEN__)
+ 		init_trampolines();
+ #endif
+ 		init_builtin_classes();
+diff --git a/objc_wasm_eh.cc b/objc_wasm_eh.cc
+index ff02d99..3948550 100644
+--- a/objc_wasm_eh.cc
++++ b/objc_wasm_eh.cc
+@@ -109,6 +109,7 @@ bool __objc_class_type_info::can_catch(
+ 	}
+ 	adjustedPtr = thrown;
+ 	return true;
++}
+ }  // namespace libobjc
+ }  // namespace gnustep
+ 

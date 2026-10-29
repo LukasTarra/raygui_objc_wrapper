@@ -3,8 +3,6 @@
 
 #import <Foundation/Foundation.h>
 #import "RayguiObjC.h"
-#include <stdio.h>
-#include <string.h>
 
 static int failures = 0;
 

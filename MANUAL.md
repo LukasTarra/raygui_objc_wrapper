@@ -48,6 +48,9 @@ Facts you should know before writing any code:
 - **Foundation only.** The wrapper uses `NSObject`/`NSString` and nothing
   from AppKit, so the *same source file* compiles on macOS (Cocoa Foundation)
   and on Linux (GNUstep Foundation) with no `#ifdef`s.
+- **Also builds for the web.** The same source compiles to a WebAssembly
+  webapp with emscripten (`Makefile.wasm`, §3.6) — libobjc2 as the ObjC
+  runtime plus a minimal Foundation shim instead of Cocoa/GNUstep.
 - **No ARC.** Everything is built with `-fno-objc-arc` (manual
   retain/release) so the same code compiles under GNUstep. Compile your own
   `.m` files the same way (see §3.3).
@@ -240,6 +243,64 @@ Three details that bite people:
 
 The easiest path is usually to copy the repo's `Makefile`, rename `DEMO` and
 `OUT`, and point it at your sources.
+
+### 3.6 Build for the web (WebAssembly / emscripten)
+
+The same `.m` sources compile unchanged to a browser webapp. You need
+`brew install emscripten` (the clang-based Wasm toolchain). emscripten ships
+**no Objective-C runtime and no Foundation**, so the wasm build adds two
+pieces — both in isolated, gitignored locations, so nothing is installed
+system-wide and the native `make` build is untouched:
+
+- `.wasm-deps/` — **libobjc2** (the GNUstep ObjC runtime: messaging, classes,
+  memory) cross-compiled for wasm32 with `-fobjc-runtime=gnustep-2.0`, plus
+  three small upstream patches (`wasm/patches/libobjc2-wasm.patch`) that only
+  touch fringe features (ObjC++ exceptions, associated objects, block
+  trampolines — messaging/classes/pools needed none). Built by
+  `wasm/scripts/build-deps.sh`.
+- `wasm/MiniFoundation/` — a minimal **Foundation shim** (`NSObject`,
+  `NSString`, `NSConstantString`, `NSMutableString`, `NSArray`, `NSLog`)
+  compiled against that runtime. The wrapper needs ~15 selectors; the full
+  gnustep-base (~204k LOC) has no wasm support in-tree (fork/exec, dlopen,
+  sockets, …) and would add MiBs to the binary.
+
+Commands:
+
+```sh
+make -f Makefile.wasm deps     # cross-build libobjc2 + raylib-web (one-time, slow)
+make -f Makefile.wasm test     # MiniFoundation unit tests, run under node
+make -f Makefile.wasm demo     # -> wasm/build/demo.html + .js + .wasm + .data
+make -f Makefile.wasm run      # build + serve http://localhost:8000/demo.html
+```
+
+Then open **http://localhost:8000/demo.html** in a browser. Do **not** open the
+HTML via `file://` — browsers block the `.wasm` fetch from file URLs ("both
+async and sync fetching of the wasm failed"); always serve over HTTP
+(`make -f Makefile.wasm run` does exactly that).
+
+Build details that differ from the native route:
+
+- raylib is compiled for `PLATFORM=Web` (OpenGL ES2) into
+  `vendor/raylib/build-web/` and linked with `-sUSE_GLFW=3 -sASYNCIFY
+  -sALLOW_MEMORY_GROWTH=1` — the web backend drives a synchronous frame loop
+  through `emscripten_sleep()`.
+- Sources compile with `emcc -x objective-c -fno-objc-arc
+  -fobjc-runtime=gnustep-2.0 -std=gnu11` (`gnu11`, not strict c11: `strnlen`
+  is hidden under `__STRICT_ANSI__` on musl).
+- The final link uses **`em++`, not `emcc`** — `libobjc.a` contains C++
+  objects and needs libc++.
+- The shell (`wasm/shell.html`) sets `Module.canvas` and
+  `arguments: ['/gravnav.rgs']`. Emscripten prepends the program name as
+  `argv[0]` by itself, so the style lands in `argv[1]` — the exact same
+  `argv[1]` code path the native demo uses. The style file is embedded with
+  `--preload-file custom-styles/gravnav.rgs@/gravnav.rgs`, because a browser
+  has no filesystem access at runtime (the pack lands in `demo.data`).
+
+To build *your own* GUI app as a webapp: copy `Makefile.wasm`, point
+`DEMO_SRC` at your `main.m`, and keep to the Foundation classes the shim
+provides — extend `wasm/MiniFoundation/` if you need more. The
+`objc-wasm-emscripten` skill (`~/.vibe/skills/objc-wasm-emscripten/`) has the
+general recipe and the shim-vs-gnustep-base tradeoff in detail.
 
 ---
 
@@ -1055,6 +1116,10 @@ if (![RGGui loadStyleAtPath:@"vendor/raygui/styles/cyber/style_cyber.rgs"]) {
   must sit next to the `.rgs` (raygui resolves it relative to the style file).
 - `loadStyleAtPath:` returns `NO` if the file can't be opened; raygui itself
   would only log a message, so the wrapper checks first.
+- **In the wasm build there is no runtime filesystem**: assets must be
+  embedded at link time (`--preload-file …@/path`) and `argv[1]` is set from
+  `Module.arguments` in `wasm/shell.html`. The wasm build embeds
+  `custom-styles/gravnav.rgs` automatically — see §3.6.
 
 ### 13.2 Tweaking individual properties at runtime
 
@@ -1301,6 +1366,10 @@ Things to notice:
   the GNUstep base libs (`gnustep-config --base-libs`).
 - **macOS frameworks** at link time: `Foundation`, `Cocoa`, `IOKit`,
   `CoreFoundation`, `OpenGL` (see §3.5).
+- **Web (Wasm).** The app runs in a browser tab, not an X11 window — see §3.6.
+  No filesystem at runtime: style/font assets are embedded at link time and
+  passed via `Module.arguments`. Always serve over HTTP; `file://` fails to
+  fetch the `.wasm`.
 
 ---
 

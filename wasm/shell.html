@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RayguiObjC demo — WebAssembly</title>
+<style>
+  html, body { margin: 0; padding: 0; background: #1e1e1e; color: #ccc;
+               font: 13px/1.4 -apple-system, sans-serif; }
+  body { min-height: 100vh; display: flex; flex-direction: column;
+         align-items: center; justify-content: center; gap: 8px; }
+  .emscripten { display: block; background: #000; border: 1px solid #444;
+                image-rendering: pixelated; }
+  #output { max-width: 800px; max-height: 160px; overflow: auto; white-space: pre-wrap;
+            color: #9a9; margin: 0; padding: 6px 10px; border: 1px solid #333;
+            border-radius: 4px; font-family: ui-monospace, monospace; font-size: 11px; }
+</style>
+</head>
+<body>
+  <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+  <pre id="output"></pre>
+  <script>
+    // Emscripten resolves the GL canvas through Module.canvas.
+    var Module = {
+      canvas: document.getElementById('canvas'),
+      // Demo loads a .rgs style from argv[1] (embedded via --preload-file).
+      arguments: ['/gravnav.rgs'],
+      print: function (t) { var el = document.getElementById('output'); if (el) el.textContent += t + '\n'; },
+      printErr: function (t) { var el = document.getElementById('output'); if (el) el.textContent += t + '\n'; }
+    };
+  </script>
+  {{{ SCRIPT }}}
+</body>
+</html>

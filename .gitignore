@@ -27,3 +27,8 @@ vendor/raylib/build/
 # Submodule working-tree patches (applied by scripts/init-submodules.sh)
 # The raygui submodule intentionally has a dirty working tree after init;
 # `git status` noise is expected and harmless.
+
+# WebAssembly build (emscripten) — fully separate from the native build
+.wasm-deps/
+wasm/build/
+vendor/raylib/build-web/

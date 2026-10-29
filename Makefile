@@ -79,7 +79,7 @@ $(OUT): $(OBJ) $(RAYLIB_A)
 	$(CC) $(OBJ) $(LIBS) $(LDFLAGS) -o $(OUT)
 
 run: $(OUT)
-	./$(OUT)
+	./$(OUT) custom-styles/gravnav.rgs
 
 # Fetch/pin the submodules and build raylib statically (idempotent).
 deps:
